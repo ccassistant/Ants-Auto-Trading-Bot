@@ -16,7 +16,7 @@ class MQPublisher(object):
     ROUTING_KEY = ''
 
     def __init__(self, exchange_name):
-        amqp_url = 'amqp://guest:guest@localhost:5672/%2F?connection_attempts=3&heartbeat=3600'
+        amqp_url = 'amqp://guest:guest@172.17.0.4:5672/%2F?connection_attempts=3&heartbeat=3600'
         self.__init2__(exchange_name, amqp_url)
         self.run()
         

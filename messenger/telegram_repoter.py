@@ -58,11 +58,12 @@ class TelegramRepoter():
             bot_token = self.conf['bot_token']
             if(bot_token is None or bot_token == ''):
                 self.conf.load_v1_config()
+                self.conf = self.conf.messenger
                 bot_token = self.conf['bot_token']
             
             self.bot = telegram.Bot(token=self.conf["bot_token"])
         except Exception as exp:
-            self.logger.error('Can''t init telegram bot : {}'.format(exp))
+            self.logger.error('Can\'t init telegram bot : {}'.format(exp))
             sys.exit(1)
             return
         

@@ -25,7 +25,7 @@ class MQReceiver():
         
         self.logger.info('exchange binding with {}, {}'.format(self.exchange_name, self.regist_callback))
         
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', heartbeat=180))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters('172.17.0.4', heartbeat=180))
         self.channel = self.connection.channel()
             
         self.channel.exchange_declare(exchange=self.exchange_name, exchange_type='fanout')

@@ -18,6 +18,12 @@ class MessengerEnv(dict):
     }
     """
     def __init__(self):
+        self['owner_id'] = ""
+        self['owner_name'] = ""
+        self['bot_id'] = ""
+        self['bot_token'] = ""
+        self['chat_id'] = ""
+        self['authorized'] = []
         pass
     
     # def __getitem__(self, key):
@@ -129,7 +135,7 @@ if __name__ == '__main__':
     idx += 1
     print(idx, '-'*240)
     print('type : {}'.format(type(env.messenger)))
-    print('data : {}'.format(env.messenger))
+    print('messenger data : {}'.format(env.messenger))
     print('func call')
     env.messenger.p()
     

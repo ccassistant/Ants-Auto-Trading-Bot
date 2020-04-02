@@ -8,17 +8,20 @@
 Python 3.6.7
 
 3.7버젼에서 오류가 발생합니다.</p>
-3.6 아래 버젼에서도 테스트해보지 못했습니다.</p>
 </p>
 </p>
-무조건 3.6으로 맞추세요 </p>
+
 </br>
 
 
 ### 설치목록
 
 ~~~
-pip install ccxt pycryptodome SQLAlchemy websocket python-telegram-bot
+pip install -U -r requirements.txt
+~~~
+
+~~~
+python3 -m venv `pwd`/venv_ants
 ~~~
 </br>
 
