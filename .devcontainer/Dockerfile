@@ -43,10 +43,23 @@ RUN apt-get update \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     #
+    # install rabbitmq server
+    && apt-get update \
+    && apt-get install rabbitmq-server -y \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
+
+#run rabbitmq-server
+RUN service rabbitmq-server start
+
+#add PYTHONPATH
+ENV PYTHONPATH "/workspaces/Ants-Auto-Trading-Bot:/workspaces/Ants-Auto-Trading-Bot/ants:/workspaces/Ants-Auto-Trading-Bot/messenger:/workspaces/Ants-Auto-Trading-Bot/enviroments:/workspaces/Ants-Auto-Trading-Bot/exchange:/workspaces/Ants-Auto-Trading-Bot/exchange/exchangem"
+
+#PIP
+# WORKDIR /workspaces/Ants-Auto-Trading-Bot/
+# RUN pip install -r /workspaces/Ants-Auto-Trading-Bot/requirements.txt
 
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog

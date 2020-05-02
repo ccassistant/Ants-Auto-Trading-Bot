@@ -10,9 +10,12 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args" : ["--port", "51593"],
+            "args": [
+                "--port",
+                "51593"
+            ],
             "env": {
-                "PYTHONPATH": "/root/devspace/Ants-Auto-Trading-Bot/ants:/root/devspace/Ants-Auto-Trading-Bot/exchange:/root/devspace/Ants-Auto-Trading-Bot/messenger:/root/devspace/Ants-Auto-Trading-Bot/enviroments:"
+                "PYTHONPATH": "/workspaces/Ants-Auto-Trading-Bot:/workspaces/Ants-Auto-Trading-Bot/ants:/workspaces/Ants-Auto-Trading-Bot/messenger:/workspaces/Ants-Auto-Trading-Bot/enviroments:/workspaces/Ants-Auto-Trading-Bot/exchange:/workspaces/Ants-Auto-Trading-Bot/exchange/exchangem"
             }
         }
     ]
