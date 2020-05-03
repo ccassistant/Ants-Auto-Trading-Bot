@@ -64,4 +64,7 @@ ENV PYTHONPATH "/workspaces/Ants-Auto-Trading-Bot:/workspaces/Ants-Auto-Trading-
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
 
+#SSH key-gen
+RUN mkdir /workspaces/.ssh/
+RUN ssh-keygen -q -t rsa -m pem -N '' -f /workspaces/.ssh/id_rsa
 
