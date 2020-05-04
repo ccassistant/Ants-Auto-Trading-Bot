@@ -32,10 +32,11 @@ RUN git checkout dev \
 ENV PYTHONPATH "/workspaces/Ants-Auto-Trading-Bot:/workspaces/Ants-Auto-Trading-Bot/ants:/workspaces/Ants-Auto-Trading-Bot/messenger:/workspaces/Ants-Auto-Trading-Bot/enviroments:/workspaces/Ants-Auto-Trading-Bot/exchange:/workspaces/Ants-Auto-Trading-Bot/exchange/exchangem"
 
 #config파일을 받도록한다
-VOLUME [ "/workspaces/Ants-Auto-Trading-Bot/configs", "/workspaces/Ants-Auto-Trading-Bot/logs"]
+VOLUME [ "/workspaces/.ssh", "/workspaces/Ants-Auto-Trading-Bot/configs", "/workspaces/Ants-Auto-Trading-Bot/logs"]
 
-#임시
-COPY entrypoint.sh /workspaces/Ants-Auto-Trading-Bot
+#pip install
+RUN . ${ANT_BOT_PATH}/venv_ants/bin/activate \ 
+    && pip install -r requirements.txt
 
 #run bot
-CMD entrypoints.sh
+CMD bash entrypoint.sh

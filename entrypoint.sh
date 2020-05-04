@@ -7,4 +7,6 @@ ssh-keygen -q -t rsa -m pem -N '' -f $SSH_DIR/id_rsa 2>/dev/null <<< n >/dev/nul
 service rabbitmq-server start
 
 
-$ANT_BOT_PATH/run.sh
+source ${ANT_BOT_PATH}/venv_ants/bin/activate
+# python ${ANT_BOT_PATH}/process_monitor.py > ./logs/console.out 2>&1 & echo $! >ant.pid
+python ${ANT_BOT_PATH}/process_monitor.py
