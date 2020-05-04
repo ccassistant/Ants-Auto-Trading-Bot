@@ -280,4 +280,3 @@ if __name__ == "__main__":
     # if(ExchangesEnv().get_trading_list('default').get('all') != True):
     #     if(coin_name not in ExchangesEnv().get_trading_list('default').get('list')):
     #         print('{} is not in trading list'.format(coin_name))
-
