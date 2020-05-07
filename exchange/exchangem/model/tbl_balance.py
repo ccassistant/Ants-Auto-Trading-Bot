@@ -10,7 +10,9 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, func
 from sqlalchemy import create_engine
 
 from sqlalchemy.ext.declarative import declarative_base
+
 Base = declarative_base()
+
 
 class Balance(Base):
     """
@@ -31,8 +33,9 @@ class Balance(Base):
     - 날짜별 매매 기록
     
     """
-    __tablename__ = 'balance'
-    
+
+    __tablename__ = "balance"
+
     id = Column(Integer, primary_key=True)
     coin_name = Column(String(8))
     market = Column(String(8))
@@ -44,11 +47,13 @@ class Balance(Base):
     time = Column(DateTime, default=datetime.utcnow)
     request_id = Column(String(50))
     exchange_name = Column(String(10))
-    
-    def __init__(self, coin_name, market, type, side, amount, price, params, time, request_id, exchange_name):
+
+    def __init__(
+        self, coin_name, market, type, side, amount, price, params, time, request_id, exchange_name
+    ):
         # engine = create_engine('sqlite://') #make in memory
         # engine = create_engine('sqlite:///foo.db')
-        
+
         self.con_name = coin_name
         self.market = market
         self.type = type
@@ -62,26 +67,25 @@ class Balance(Base):
         pass
 
 
+if __name__ == "__main__":
 
-
-if __name__ == '__main__':
-    
     def init_db():
-    # 	import models
+        # 	import models
         from sqlalchemy import create_engine
-        engine = create_engine('sqlite:///test_data.db', echo=False)
+
+        engine = create_engine("sqlite:///test_data.db", echo=False)
         Base.metadata.create_all(bind=engine)
-        
+
     init_db()
-    
-    print('test')
+
+    print("test")
     logger = logging.getLogger()
     logger.setLevel(logging.WARNING)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     stream_hander = logging.StreamHandler()
     stream_hander.setFormatter(formatter)
     logger.addHandler(stream_hander)
-    
+
     logging.getLogger("__main__").setLevel(logging.DEBUG)
     # logging.getLogger("ccxt").setLevel(logging.WARNING)
     # logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
@@ -91,79 +95,63 @@ if __name__ == '__main__':
     # engine = create_engine('sqlite:///orm_in_detail.db', echo=True)
 
     sqlite = exchangem.database.sqlite_db.Sqlite()
-    
-    print('---------------------------------')
+
+    print("---------------------------------")
 
     # from sqlalchemy.orm import sessionmaker
     # session = sessionmaker()
     # session.configure(bind=engine)
     # Base.metadata.create_all(engine)
 
-    print('---------------------------------')
-    print('func : {}'.format(func.now()))
-    print('datatime : {}'.format(datetime.now()))
-    print('datatime : {}'.format(datetime.utcnow))
+    print("---------------------------------")
+    print("func : {}".format(func.now()))
+    print("datatime : {}".format(datetime.now()))
+    print("datatime : {}".format(datetime.utcnow))
 
-    coin_name = 'btc'
-    market = 'WON'
-    type = 'limit'
-    side = 'buy'
+    coin_name = "btc"
+    market = "WON"
+    type = "limit"
+    side = "buy"
     amount = 1.1
     price = 0.45
-    params = ''
+    params = ""
     time = datetime.now()
-    request_id = ''
-    exchange_name = 'binance'
-    
-    tr = Balance(
-                 coin_name,
-                 market,
-                 type,
-                 side,
-                 amount,
-                 price,
-                 params,
-                 time,
-                 request_id,
-                 exchange_name)
-    
-    print('---------------------------------')
-    # s = session()
-    # s.add(tr)
-    # s.commit()      
-    print('---------------------------------')
-    sqlite.add(tr)
-                 
-    coin_name = 'btc'
-    market = 'WON'
-    type = 'limit'
-    side = 'sell'
-    amount = 1.1
-    price = 0.45
-    params = ''
-    time = datetime.now()
-    request_id = ''
-    exchange_name = 'binance'
-    tr = Balance(
-                 coin_name,
-                 market,
-                 type,
-                 side,
-                 amount,
-                 price,
-                 params,
-                 time,
-                 request_id,
-                 exchange_name)
+    request_id = ""
+    exchange_name = "binance"
 
-    sqlite.add(tr)
-    
+    tr = Balance(
+        coin_name, market, type, side, amount, price, params, time, request_id, exchange_name
+    )
+
+    print("---------------------------------")
     # s = session()
     # s.add(tr)
     # s.commit()
-    print('--------------------------------------')
+    print("---------------------------------")
+    sqlite.add(tr)
+
+    coin_name = "btc"
+    market = "WON"
+    type = "limit"
+    side = "sell"
+    amount = 1.1
+    price = 0.45
+    params = ""
+    time = datetime.now()
+    request_id = ""
+    exchange_name = "binance"
+    tr = Balance(
+        coin_name, market, type, side, amount, price, params, time, request_id, exchange_name
+    )
+
+    sqlite.add(tr)
+
+    # s = session()
+    # s.add(tr)
+    # s.commit()
+    print("--------------------------------------")
     # sqlite.query(Trading).all()
     # print(s.query(Trading).all())
-    
+
     sqlite.close()
-    
+

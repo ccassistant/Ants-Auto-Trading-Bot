@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-class OrderInfo():
+
+class OrderInfo:
     """
     {
         "Symbol" : "BTC/USDT",
@@ -16,23 +17,36 @@ class OrderInfo():
         
     }
     """
+
     def __init__(self):
-        self.symbol = ''
-        self.id = ''
-        self.side = ''
-        self.price = ''
-        self.amount = ''
-        self.status = ''
-        self.remaining = ''
-        self.ts_create = ''
-        self.ts_updated = ''
-        self.exchange = ''
-        self.from_who = ''
+        self.symbol = ""
+        self.id = ""
+        self.side = ""
+        self.price = ""
+        self.amount = ""
+        self.status = ""
+        self.remaining = ""
+        self.ts_create = ""
+        self.ts_updated = ""
+        self.exchange = ""
+        self.from_who = ""
         self.etc = {}
-        
-        pass
-    
-    def set(self, symbol, id, side, price, amount, status, remaining, ts_create, ts_updated, exchange, _from, etc={}):
+
+    def set(
+        self,
+        symbol,
+        id,
+        side,
+        price,
+        amount,
+        status,
+        remaining,
+        ts_create,
+        ts_updated,
+        exchange,
+        _from,
+        etc={},
+    ):
         self.symbol = symbol
         self.id = id
         self.side = side
@@ -45,7 +59,7 @@ class OrderInfo():
         self.exchange = exchange
         self.from_who = _from
         self.etc = etc
-        
+
     def __repr__(self):
         return str(dict(self))
         # return str({
@@ -59,29 +73,28 @@ class OrderInfo():
         #     'ts_create': self.order['ts_create'],
         #     'ts_updated': self.order['ts_updated']
         # })
-       
+
     def __iter__(self):
         klass = self.__class__
-        iters = dict((x,y) for x,y in klass.__dict__.items() if x[:2] != '__' and not callable(y))
+        iters = dict((x, y) for x, y in klass.__dict__.items() if x[:2] != "__" and not callable(y))
 
         iters.update(self.__dict__)
 
-        exclude=['']
-        for x,y in iters.items():
-            if(x not in exclude):
-                yield x,y
-                
+        exclude = [""]
+        for x, y in iters.items():
+            if x not in exclude:
+                yield x, y
+
     def __getitem__(self, key):
         return getattr(self, key)
-        
+
     def __setitem__(self, key, value):
-        if(hasattr(self, key)):
+        if hasattr(self, key):
             setattr(self, key, value)
         else:
-            raise Exception(f'{key} is not exist')
-    
-if __name__ == '__main__':
-    print('test')
-    
-    
-    
+            raise Exception(f"{key} is not exist")
+
+
+if __name__ == "__main__":
+    print("test")
+

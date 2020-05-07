@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
-print('init in {}'.format(__name__))
+print("init in {}".format(__name__))
 base = [
-    'Exchange',
-    'exchanges',
-    'decimal_to_precision',
+    "Exchange",
+    "exchanges",
+    "decimal_to_precision",
 ]
 
-exchange = [
-    'upbit',
-    'bithumb'
-]
+exchange = ["upbit", "bithumb"]
 
 utils = [
-    'Util',
+    "Util",
 ]
 
 __all__ = base + utils + exchange
@@ -21,4 +18,3 @@ __all__ = base + utils + exchange
 # sys.path.append(".")
 # import os
 # print (os.getcwd())
-

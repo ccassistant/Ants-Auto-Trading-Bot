@@ -13,53 +13,38 @@ import json
 # format 참고
 # '%(levelname) -10s %(asctime)s %(name) -30s %(funcName) -35s %(lineno) -5d: %(message)s'
 
+
 DEFAULT_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "default": {
-            "format": "%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s",
-        },
-        "simple": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        },
+        "default": {"format": "%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s",},
+        "simple": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",},
     },
     "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "DEBUG",
-            "formatter": "simple"
-        },
-        "file":{
+        "console": {"class": "logging.StreamHandler", "level": "DEBUG", "formatter": "simple"},
+        "file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
             "when": "midnight",
             "backupCount": 31,
             "level": "DEBUG",
             "formatter": "default",
-            "filename" : "logs/ants.log",
-            "encoding": "utf-8"
-        }
+            "filename": "logs/ants.log",
+            "encoding": "utf-8",
+        },
     },
     "loggers": {
-        "__main__": {
-            "handlers": ["console","file"],
-            "level": "INFO",
-        },
+        "__main__": {"handlers": ["console", "file"], "level": "INFO",},
         "TEST_CLASS_NAME": {
             "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
     },
-    "root":{
-        "handlers": ["console","file"],
-        "level": "DEBUG",
-    }
+    "root": {"handlers": ["console", "file"], "level": "DEBUG",},
 }
 
-
-
-#The log settings are read from the file
-#If there is no setting, follow the default setting.
+# The log settings are read from the file
+# If there is no setting, follow the default setting.
 
 logging.basicConfig()
 try:
@@ -82,7 +67,7 @@ if __name__ == "__main__":
     logging.debug("debug log")
     print("...?")
     print("...?")
-    
+
 
 # logger.setLevel(logging.DEBUG)
 
@@ -95,4 +80,3 @@ if __name__ == "__main__":
 # file_handler = logging.FileHandler("./logs/ants.log")
 # file_handler.setFormatter(formatter)
 # logger.addHandler(file_handler)
-

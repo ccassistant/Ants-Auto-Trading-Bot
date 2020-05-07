@@ -4,6 +4,7 @@ from menus.setting.exchange.apis import ExchangeAPIs
 from menus.setting.exchange.upbit import Upbit
 from menus.setting.exchange.bithumb import Bithumb
 
+
 class Exchange(MenuItem):
     def __init__(self):
         super().__init__()
@@ -12,10 +13,9 @@ class Exchange(MenuItem):
         # self.__add__(Binance())
         self.__add__(BackMenu())
         pass
-    
+
     def __repr__(self):
-        return '거래소 설정'
+        return "거래소 설정"
 
     def to_dict(self):
-        return '거래소 설정'
-        
+        return "거래소 설정"

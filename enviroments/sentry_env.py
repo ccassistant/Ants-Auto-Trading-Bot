@@ -88,4 +88,3 @@ if __name__ == "__main__":
 
     my_sentry = env.sentry
     print("sentry dsn : {}".format(my_sentry["dsn"]))
-

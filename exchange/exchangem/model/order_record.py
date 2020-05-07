@@ -10,7 +10,9 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, func
 from sqlalchemy import create_engine
 
 from sqlalchemy.ext.declarative import declarative_base
+
 Base = declarative_base()
+
 
 class OrderRecord(Base):
     """
@@ -35,8 +37,9 @@ class OrderRecord(Base):
     # {'symbol': 'MCO/KRW', 'id': 'd4910a41-385d-4ba9-8317-a8e9ffbc544f', 'side': 'sell', 'price': 8215.0, 'amount': 3.84565168, 'status': 'open', 'remaining': 3.84565168, 'ts_create': 1559005222000, 'ts_updated': None}
     
     """
-    __tablename__ = 'trading'
-    
+
+    __tablename__ = "trading"
+
     id = Column(Integer, primary_key=True)
     coin_name = Column(String(8))
     market = Column(String(8))
@@ -49,8 +52,21 @@ class OrderRecord(Base):
     request_id = Column(String(50))
     exchange_name = Column(String(10))
     raw = Column(String(255))
-    
-    def __init__(self, coin_name, market, type, side, amount, price, params, time, request_id, exchange_name, raw=None):
+
+    def __init__(
+        self,
+        coin_name,
+        market,
+        type,
+        side,
+        amount,
+        price,
+        params,
+        time,
+        request_id,
+        exchange_name,
+        raw=None,
+    ):
         self.coin_name = coin_name
         self.market = market
         self.type = type
@@ -62,29 +78,44 @@ class OrderRecord(Base):
         self.request_id = request_id
         self.exchange_name = exchange_name
         self.raw = raw
-        
+
         self.logger = logging.getLogger(__name__)
-        self.logger.info('{},{},{},{},{},{},{},{},{},{},{}'.format(coin_name, market, type, side, amount, price, params, time, request_id, exchange_name, raw))
+        self.logger.info(
+            "{},{},{},{},{},{},{},{},{},{},{}".format(
+                coin_name,
+                market,
+                type,
+                side,
+                amount,
+                price,
+                params,
+                time,
+                request_id,
+                exchange_name,
+                raw,
+            )
+        )
         pass
 
 
+if __name__ == "__main__":
 
-if __name__ == '__main__':
     def init_db():
         from sqlalchemy import create_engine
-        engine = create_engine('sqlite:///test_data.db', echo=False)
+
+        engine = create_engine("sqlite:///test_data.db", echo=False)
         Base.metadata.create_all(bind=engine)
-        
+
     init_db()
 
-    print('test')
+    print("test")
     logger = logging.getLogger()
     logger.setLevel(logging.WARNING)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     stream_hander = logging.StreamHandler()
     stream_hander.setFormatter(formatter)
     logger.addHandler(stream_hander)
-    
+
     logging.getLogger("__main__").setLevel(logging.DEBUG)
     # logging.getLogger("ccxt").setLevel(logging.WARNING)
     # logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
@@ -94,82 +125,66 @@ if __name__ == '__main__':
     # engine = create_engine('sqlite:///orm_in_detail.db', echo=True)
 
     sqlite = exchangem.database.sqlite_db.Sqlite()
-    
-    print('---------------------------------')
+
+    print("---------------------------------")
 
     # from sqlalchemy.orm import sessionmaker
     # session = sessionmaker()
     # session.configure(bind=engine)
     # Base.metadata.create_all(engine)
 
-    print('---------------------------------')
-    print('func : {}'.format(func.now()))
-    print('datatime : {}'.format(datetime.now()))
-    print('datatime : {}'.format(datetime.utcnow))
+    print("---------------------------------")
+    print("func : {}".format(func.now()))
+    print("datatime : {}".format(datetime.now()))
+    print("datatime : {}".format(datetime.utcnow))
 
-    coin_name = 'btc'
-    market = 'WON'
-    type = 'limit'
-    side = 'buy'
+    coin_name = "btc"
+    market = "WON"
+    type = "limit"
+    side = "buy"
     amount = 1.1
     price = 0.45
     params = str({})
     time = datetime.now()
-    request_id = ''
-    exchange_name = 'Test'
-    
-    tr = Trading(
-                 coin_name,
-                 market,
-                 type,
-                 side,
-                 amount,
-                 price,
-                 params,
-                 time,
-                 request_id,
-                 exchange_name)
-    
-    print('---------------------------------')
-    # s = session()
-    # s.add(tr)
-    # s.commit()      
-    print('---------------------------------')
-    sqlite.add(tr)
-                 
-    coin_name = 'btc'
-    market = 'WON'
-    type = 'limit'
-    side = 'sell'
-    amount = 1.1
-    price = 0.45
-    params = ''
-    time = datetime.now()
-    request_id = ''
-    exchange_name = 'Test'
-    tr = Trading(
-                 coin_name,
-                 market,
-                 type,
-                 side,
-                 amount,
-                 price,
-                 params,
-                 time,
-                 request_id,
-                 exchange_name)
+    request_id = ""
+    exchange_name = "Test"
 
-    sqlite.add(tr)
-    
+    tr = Trading(
+        coin_name, market, type, side, amount, price, params, time, request_id, exchange_name
+    )
+
+    print("---------------------------------")
     # s = session()
     # s.add(tr)
     # s.commit()
-    print('--------------------------------------')
+    print("---------------------------------")
+    sqlite.add(tr)
+
+    coin_name = "btc"
+    market = "WON"
+    type = "limit"
+    side = "sell"
+    amount = 1.1
+    price = 0.45
+    params = ""
+    time = datetime.now()
+    request_id = ""
+    exchange_name = "Test"
+    tr = Trading(
+        coin_name, market, type, side, amount, price, params, time, request_id, exchange_name
+    )
+
+    sqlite.add(tr)
+
+    # s = session()
+    # s.add(tr)
+    # s.commit()
+    print("--------------------------------------")
     # sqlite.query(Trading).all()
     # print(s.query(Trading).all())
-    
+
     # print(sqlite.query(Trading).all())
-    
+
     # sqlite.close()
-    
+
     sqlite.export_csv(Trading.__tablename__)

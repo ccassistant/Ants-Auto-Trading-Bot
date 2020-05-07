@@ -4,4 +4,4 @@ import sys
 
 # sys.path.append(".")
 # print (os.getcwd())
-print('init in {}'.format(__name__))
+print("init in {}".format(__name__))

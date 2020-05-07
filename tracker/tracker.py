@@ -5,16 +5,19 @@ from price_tracker import PriceTracker
 from messenger.q_publisher import MQPublisher
 from env_server import Enviroments
 
-class BaseClass():
-	pass
+
+class BaseClass:
+    pass
+
 
 class Singleton(type):
-	_instances = {}
+    _instances = {}
 
-	def __call__(cls, *args, **kwargs):
-		if cls not in cls._instances:
-			cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-		return cls._instances[cls]
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
 
 class Tracker(BaseClass, metaclass=Singleton):
     """
@@ -25,42 +28,42 @@ class Tracker(BaseClass, metaclass=Singleton):
     
     요청할 때 조건을 만족할 때 호출된 함수를 넣어서 큐에 넣는다.
     """
+
     def __init__(self, args={}):
         self.logger = logging.getLogger(__name__)
-        
+
         self.telegram_messenger_exchange_name = Enviroments().qsystem.get_telegram_messenge_q()
         self.messenger_q = MQPublisher(self.telegram_messenger_exchange_name)
-        self.logger.debug(f'telegram message q name : {self.telegram_messenger_exchange_name}')
+        self.logger.debug(f"telegram message q name : {self.telegram_messenger_exchange_name}")
         self.exchanges = {}
         self.price_tracker = PriceTracker()
-        
+
     def add_exchange(self, name, exchange):
         self.exchanges[name.upper()] = exchange
-        
+
     def get_exchange(self, name):
         return self.exchanges[name.upper()]
-    
-    
-    
-if __name__ == '__main__':
-    print('strategy test')
-    
+
+
+if __name__ == "__main__":
+    print("strategy test")
+
     import os
-    path = os.path.dirname(__file__) + '/../configs/ant_auto.conf'
-    print('path : {}'.format(path))
+
+    path = os.path.dirname(__file__) + "/../configs/ant_auto.conf"
+    print("path : {}".format(path))
     Enviroments().load_config(path)
-    
+
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     stream_hander = logging.StreamHandler()
     stream_hander.setFormatter(formatter)
     logger.addHandler(stream_hander)
-    
+
     logging.getLogger("ccxt.base.exchange").setLevel(logging.WARNING)
     logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
     logging.getLogger("telegram").setLevel(logging.WARNING)
     logging.getLogger("exchangem").setLevel(logging.ERROR)
     logging.getLogger("exchange").setLevel(logging.ERROR)
-    
- 
+

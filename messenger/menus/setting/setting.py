@@ -4,6 +4,7 @@ from menus.menu_back import BackMenu
 from menus.setting.exchange.exchange import Exchange
 from menus.setting.common.common import Common
 
+
 class Setting(MenuItem):
     def __init__(self):
         super().__init__()
@@ -11,11 +12,9 @@ class Setting(MenuItem):
         self.__add__(Common())
         self.__add__(BackMenu())
         pass
-    
+
     def __repr__(self):
-        return '설정'
-    
+        return "설정"
+
     def to_dict(self):
-        return '설정'
-    
-    
+        return "설정"
