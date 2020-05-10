@@ -7,6 +7,7 @@ import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from ants.message_parser import MessageDict
 
 import ants.utils as utils
 import logging
@@ -20,13 +21,21 @@ from selfupgrade import CheckForUpdate
 from distutils.dir_util import copy_tree
 from sh import git
 import time
-import os, sys
+import os
+import sys
 from env_server import Enviroments
 
 from exchangem.model.price_storage import PriceStorage
 
 
 class TelegramRepoter:
+    """
+    유저로부터 입력 받아서 권한 검사 후 해당 메시지 큐로 명령을 전달하는 역할을 한다
+    FIXME 표준 메시지 파서를 호출하도록 교체해야함
+    FIXME 메시지 파싱 후 명령 수행까지 처리하는데 가능한 액션은 액션 담당하는 클래스로 메시지를 전달하고 마무리하도록 한다
+    FIXME 메뉴 호출하는 부분 더 나은 방식으로 수정 필요
+    """
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.logger.info("TelegramRepoter init...")
@@ -37,7 +46,7 @@ class TelegramRepoter:
         self.publisher_list = {}
         self.basic_queue_exchange_name = Enviroments().qsystem.get_quicktrading_q()
         self.subscriber_name = Enviroments().qsystem.get_telegram_messenge_q()
-        self.publisher = MQPublisher(self.basic_queue_exchange_name)
+        self.basic_publisher = MQPublisher(self.basic_queue_exchange_name)
         self.subscriber = MQReceiver(self.subscriber_name, self.sbuscribe_message)
         self.subscriber.start()
 
@@ -210,16 +219,22 @@ class TelegramRepoter:
                 self.menu_stack.append(item)
                 break
 
-        is_auto_trading = False
         self.logger.debug("fined item : {}".format(menu_item))
-        if menu_item is None:
-            if message["text"].find("#AUTO") == 0:  # 봇에 의한 자동 매매인지 확인
-                is_auto_trading = self.check_auto_trading(message)
+        try:
+            msg_dict = MessageDict().parsing(message["text"])
 
-            if not is_auto_trading:
-                self.check_quick_trading(message)  # 유저에 의해 입력된 수동 매매
-            return
+            if menu_item is None:
+                # 최상위 메뉴일 때만 거래를 수행하도록 한다
+                if (msg_dict.get("AUTO") != None) and (msg_dict.get("AUTO") == 1):
+                    self.check_auto_trading(message)  # auto가 입력되면 자동 매매로 간주한다
+                else:
+                    self.check_quick_trading(message)  # 유저에 의해 입력된 수동 매매
 
+            return  # 퀵트레이딩이일 경우 여기서 끝낸다
+        except Exception as exp:
+            self.logger.warning(exp)
+
+        # 퀵 트레이딩이 아닐 경우 서브 메뉴를 검사한다
         # 방법1. 동작안함. dp.restart 해야하는데, stop이후 start하면 뻗음.. 설령 stop이 된다고 하더라도 내부적으로 thread라 join되는데 기다리는데 시간이 많이 걸림
         # 현재 메시지 처리기를 지우고 하위 메뉴의 메시지 처리기를 등록해준다
         # https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/ext/dispatcher.py
@@ -239,79 +254,21 @@ class TelegramRepoter:
         # menu_item.parsering(update, text)
 
     def parsing(self, msg):
-        msg = msg.upper().split("#")
-        msg = msg[1:]
-        self.logger.debug(msg)
-
-        ver = None
-        for item in msg:
-            ver = item.split(":")[0].upper().strip()
-            if ver == "VER":
-                ver = item.split(":")[1].strip()
-                break
-
-        if ver == None:
-            msg = "can" "t find version information"
-            self.logger.debug(msg)
-            raise Exception(msg)
-
-        if ver == "1":
-            return self.parsing_v1(msg)
-
-        msg = f"This version:({ver}) is not support"
-        self.logger.debug(msg)
-        raise Exception(msg)
-
-    def parsing_v1(self, msg):
-        """
-        {
-            'AUTO':True,
-            'EXCHANGE':'upbit',
-            'COIN':'BTC',
-            'MARKET':'KRW',
-            'TYPE':'LIMIT',
-            'SIDE':'BUY',
-            'RULE':'TSB',
-            'TSB-MINUTE':'15m'
-            'TSB-VER':'3.3'
-        }
-        """
-        result = {}
-        for item in msg:
-            try:
-                item = item.strip()  # 공백 제거
-                item = item.split(":")
-                result[item[0].lower()] = item[1].upper()
-            except Exception as exp:
-                self.logger.warning("message parsing error : {}".format(exp))
-                raise exp
-
-        c = result["ver"]
-        c = result["auto"]
-        c = result["exchange"]
-        c = result["coin"]
-        c = result["market"]
-        if result.get("type") is None:
-            result["type"] = "limit"
-        c = result["type"]
-        c = result["side"]
-        c = result["rule"]
-
-        return result
+        return MessageDict().parsing(msg)
 
     def check_auto_trading(self, message):
         # 이중 체크라 필요없지만 다른 곳에서 이 함수를 호출 할 수 있으므로.
         if not self.check_authorized(message["from"]):
             return
 
-        self.logger.debug("check_auto_trading got message : {}".format(message))
+        self.logger.debug("check_auto_trading got message : %s", message)
         try:
             split_key = "-" * 70
             msg = message["text"]
             msg = msg[: msg.find(split_key)]
             order = self.parsing(msg)
         except Exception as exp:
-            self.logger.debug("check_auto_trading header paring Exception : {}".format(exp))
+            self.logger.warning("check_auto_trading header paring Exception : %s", exp)
             self.send_message("잘못된 메시지를 받았습니다\n{}".format(exp))
             return
 
@@ -333,7 +290,7 @@ class TelegramRepoter:
             # rule 이름으로 된 큐로 메시지를 날려준다
             self.publish_to_q(q_name, order)
         except Exception as exp:
-            self.logger.debug("check_auto_trading body paring Exception : {}".format(exp))
+            self.logger.debug("check_auto_trading body paring Exception : %s", exp)
             return
 
         self.send_message("입력된 자동매매를 시도합니다")
@@ -352,49 +309,58 @@ class TelegramRepoter:
         if not self.check_authorized(message["from"]):
             return
 
-        self.logger.debug("check_quick_trading got message : {}".format(message))
         try:
-            text = message["text"].split(" ")
-            action = text[0].strip().lower()
-
-            if (action in ["buy", "sell", "show"]) == False:
-                return
+            msg_dict = MessageDict().parsing(message["text"])
+            self.basic_publisher.send(msg_dict)
         except Exception as exp:
-            self.logger.debug("check_quick_trading header paring Exception : {}".format(exp))
+            self.logger.warning("%s", exp)
             return
 
-        try:
-            self.logger.debug("check quick trading msg : {}".format(action))
-            # text = text.split(' ')
-            ret = {}
-            ret["version"] = 3
-            command = ret["command"] = text[0].strip().upper()
+        # self.logger.debug("check_quick_trading got message : {}".format(message))
+        # try:
+        #     text = message["text"].split(" ")
+        #     action = [s for s in text if "#SIDE" in s].pop()
+        #     if action == None:
+        #         raise Exception("#side is missing")
+        #     action = action.upper().split(":")[1]
 
-            if command in ["BUY", "SELL"]:
-                ret["exchange"] = text[1].strip().upper()
-                ret["market"] = text[2].strip().upper()
-                ret["coin"] = text[3].strip().upper()
-                ret["price"] = text[4].strip()
-                ret["seed"] = text[5].strip()
-                ret["rule"] = None
-                ret["etc"] = {}
-                ret["etc"]["from"] = eval(str(message["from"]))
-            else:
-                if command in ["SHOW"]:
-                    ret["sub_cmd"] = text[1].strip().upper()
-                    ret["exchange"] = text[2].strip().upper()
-                    try:
-                        ret["coin_name"] = text[3].strip().upper()
-                    except Exception:
-                        ret["coin_name"] = ""
+        #     if (action in ["BUY", "SELL", "SHOW"]) == False:
+        #         raise Exception("#side valvue wrong")
+        # except Exception as exp:
+        #     self.logger.warning("check_quick_trading header paring Exception : %s", exp)
+        #     return
 
-            self.publisher.send(ret)
-        except Exception as exp:
-            self.logger.debug("check_quick_trading body paring Exception : {}".format(exp))
-            return
+        # try:
+        #     self.logger.debug("check quick trading msg : {}".format(action))
+        #     # text = text.split(' ')
+        #     ret = {}
+        #     ret["version"] = 3
+        #     command = ret["command"] = action
+
+        #     if command in ["BUY", "SELL"]:
+        #         ret["exchange"] = text[1].strip().upper()
+        #         ret["market"] = text[2].strip().upper()
+        #         ret["coin"] = text[3].strip().upper()
+        #         ret["price"] = text[4].strip()
+        #         ret["seed"] = text[5].strip()
+        #         ret["rule"] = None
+        #         ret["etc"] = {}
+        #         ret["etc"]["from"] = eval(str(message["from"]))
+        #     else:
+        #         if command in ["SHOW"]:
+        #             ret["sub_cmd"] = text[1].strip().upper()
+        #             ret["exchange"] = text[2].strip().upper()
+        #             try:
+        #                 ret["coin_name"] = text[3].strip().upper()
+        #             except Exception:
+        #                 ret["coin_name"] = ""
+
+        #     self.basic_publisher.send(ret)
+        # except Exception as exp:
+        #     self.logger.debug("check_quick_trading body paring Exception : {}".format(exp))
+        #     return
 
         self.send_message("요청 하신 내용을 수행중입니다")
-        pass
 
     def build_menu(self, buttons, n_cols, header_buttons=None, footer_buttons=None):
         menu = [buttons[i : i + n_cols] for i in range(0, len(buttons), n_cols)]
@@ -544,7 +510,7 @@ class TelegramRepoter:
         ret["exchange"] = exchange
         ret["id"] = order_id
 
-        self.publisher.send(ret)
+        self.basic_publisher.send(ret)
 
         # query = context.callback_query
         # if(query.message.chat.type != 'private'):

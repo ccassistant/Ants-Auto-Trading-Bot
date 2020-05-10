@@ -90,7 +90,9 @@ class ApiAdd(MenuItem):
             message = "{}거래소 API키를 추가 했습니다. \n대화창에 입력된 API Key는 지워주세요".format(self.exchange_name)
         except Exception as exp:
             message = "오류 : api키 추가중 오류가 발생하였습니다\n{}".format(exp)
-            self.logger.warning(message)
+            self.logger.error(message)
+            # TODO FIXME 중요한 에러인데 사용자가 노티를 받을 수 없다.
+            # TODO FIXME 에러 리포팅 클래스를 작성 후 에러 내용에 따라 쉽게 처리할 수 있는 클래스가 있어야한다
 
         super().make_menu_keyboard(self.bot, self.chat_id, message)
         self.go_back()

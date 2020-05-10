@@ -8,7 +8,8 @@ import sys
 class QsystemEnv(dict):
     """
     {
-        
+        표준화된 큐 이름을 생성 & 알려주는 역할을 한다
+        모든 큐 이름은 이 클래스를 통해서 생성, 보관, 조회 한다
     }
     """
 
@@ -119,4 +120,3 @@ if __name__ == "__main__":
     env.qsystem["tsb.314.45"] = "tsb.314.45"
     print(env.qsystem.get("tsb.314.45"))
     # Enviroments().save_config()
-

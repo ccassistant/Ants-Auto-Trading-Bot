@@ -68,7 +68,7 @@ class MenuItem(MIterators, metaclass=abc.ABCMeta):
         # 그 외 핸들러들을 등록���준다.
         message = context.message
         text = message.text
-        self.logger.debug(message.text)
+        # self.logger.debug(message.text) #api key가 로그로 남는다.
 
         menu_item = None
         for item in self.m_list:

@@ -65,15 +65,13 @@ class MQStrategy(ants.strategies.strategy.StrategyBase, Observer):
 
     def trading(self, msg):
         try:
-            version = msg["version"]
-            command = msg["command"]
+            command = msg["side"]
             exchange = msg["exchange"]
             market = msg["market"]
             coin_name = msg["coin"]
             price = msg["price"]
-            amount = msg["seed"]
-            rule = msg["rule"]
-            etc = msg["etc"]
+            amount = msg["amount"]
+            etc = msg.get("etc")
         except Exception as exp:
             self.logger.warning("msg parsing error : {}".format(exp))
             return
@@ -88,7 +86,6 @@ class MQStrategy(ants.strategies.strategy.StrategyBase, Observer):
             # order_info는 오더를 생성하고 서버에서 받은 정보를 가지고 있다. 즉 오더 id를 가지고 있음
 
             # 생성된 오더 정보를 기반으로 추적 시스템에 넣는다
-            # 오더 분봉에 정보를 가지고 와서 분봉이 close되면 모든 오더가 취소되는 기능을 넣는다
             # message = result['msg']
             # order_info = result['order_info']
             self.logger.debug("trading result : \n{}\n{}".format(message, order_info))
@@ -101,7 +98,7 @@ class MQStrategy(ants.strategies.strategy.StrategyBase, Observer):
 
         if order_info == None:
             # 트레이딩 실패
-            self.logger.warning("Trading was failed")
+            self.logger.warning("Trading was failed\n%s", message)
             self.messenger_q.send("실패 : 요청하신 내용을 실패하였습니다.\n{}".format(message))
             return
 
@@ -110,8 +107,8 @@ class MQStrategy(ants.strategies.strategy.StrategyBase, Observer):
 
     def do_action(self, msg):
         try:
-            version = msg["version"]
-            command = msg["command"]
+            version = msg["ver"]
+            command = msg["side"]
         except Exception as exp:
             self.logger.warning("msg parsing error : {}".format(exp))
             return
@@ -258,4 +255,3 @@ if __name__ == "__main__":
 
     print("-" * 160)
     # mq.telegram.stop_listener()
-

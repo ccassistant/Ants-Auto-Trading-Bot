@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pika
-import sys
-import datetime
-import time
-import ants.utils as utils
 import json
 import logging
-import threading
 
 from ants.provider.provider import Provider
 from messenger.q_receiver import MQReceiver
@@ -17,6 +11,10 @@ from env_server import Enviroments
 
 
 class MQProvider(Provider):
+    """
+    Q로 전달된 메시지를 받아서 노티해준다
+    """
+
     def __init__(self, q_name=None):
         Provider.__init__(self)
         self.logger = logging.getLogger(__name__)
@@ -27,8 +25,7 @@ class MQProvider(Provider):
             self.exchange_name = q_name
         self.mq_receiver = MQReceiver(self.exchange_name, self.callback)
 
-        self.isRun = False
-        pass
+        self.is_run = False
 
     def callback(self, ch, method, properties, body):
         body = json.loads(body.decode("utf-8"))
@@ -44,19 +41,16 @@ class MQProvider(Provider):
     def register(self, update, coins):
         self.logger.info("register update")
         self.attach(update)
-        pass
 
     def run(self):
         self.logger.info("Try MQ subscribe start")
         self.mq_receiver.start()
-        pass
 
     def stop(self):
         self.logger.info("MQ provider will stop...")
-        self.isRun = False
+        self.is_run = False
         self.mq_receiver.close()
         self.logger.info("MQ provider will stop.")
-        pass
 
 
 if __name__ == "__main__":
